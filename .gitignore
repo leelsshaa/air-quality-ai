@@ -1,0 +1,6 @@
+AI/venv/
+AI/datasets/
+AI/saved_models/
+__pycache__/
+.ipynb_checkpoints/
+*.pyc
