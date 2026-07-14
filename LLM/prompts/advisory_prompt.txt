@@ -49,9 +49,20 @@ OUTPUT SCHEMA (return exactly this structure):
 }
 
 RULES:
-- Every field must be filled. Do not omit fields.
-- Do not use vague language ("take precautions", "stay safe", "be careful"). Every string must contain a specific fact or instruction.
-- risk_level must be derived from aqi_value using standard CPCB breakpoints, not just copied from aqi_category.
-- If pollutant_breakdown_json is provided, tailor precautionary_actions to the dominant pollutant (e.g., PM2.5 → mask emphasis, O3 → avoid midday outdoor activity).
-- Respond in $language_code. If bilingual is requested, return an additional top-level key "translation" with the same schema.
-- Output must be parseable by a standard JSON parser with no post-processing.
+
+- Return ONLY valid JSON.
+- Do NOT include markdown.
+- Do NOT use ```json or ``` code fences.
+- Do NOT explain your answer.
+- Do NOT add text before or after the JSON.
+- Every field in the schema must be present.
+- The response must be parseable by Python's json.loads().
+- If you cannot generate a value, return null instead of omitting the field.
+- Follow the schema exactly.
+- Do not change any key names or add extra keys unless explicitly requested.
+- Risk level must be derived from the AQI value using CPCB AQI ranges.
+- Tailor the health advice based on the dominant pollutant.
+- Keep recommendations concise and practical.
+
+IMPORTANT:
+Your entire response must consist of exactly one valid JSON object. The first character must be "{" and the last character must be "}".
