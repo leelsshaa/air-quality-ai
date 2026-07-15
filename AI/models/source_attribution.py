@@ -67,3 +67,13 @@ def get_pollution_source(pm25, pm10, no2, so2, co):
             "reason": "Natural factors such as dust, pollen, and weather conditions."
         }
     }
+if __name__ == "__main__":
+    result = get_pollution_source(
+        pm25=150,
+        pm10=220,
+        no2=55,
+        so2=18,
+        co=2.5
+    )
+
+    print(result)
