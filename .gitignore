@@ -1,6 +1,13 @@
+# LLM
+venv/
+.env
+
+# Python
+__pycache__/
+*.pyc
+
+# AI Team
 AI/venv/
 AI/datasets/
 AI/saved_models/
-__pycache__/
 .ipynb_checkpoints/
-*.pyc
