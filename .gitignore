@@ -9,5 +9,6 @@ __pycache__/
 # AI Team
 AI/venv/
 AI/datasets/
-AI/saved_models/
+AI/saved_models/*
+!AI/saved_models/aqi_model.pkl
 .ipynb_checkpoints/
