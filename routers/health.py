@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from models.schemas import HealthRequest, HealthResponse
 
-from llm.advisor import generate_health_advice
+from LLM .advisor import generate_health_advice
 
 router = APIRouter()
 
