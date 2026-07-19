@@ -1,10 +1,10 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 
 from models.schemas import DashboardResponse
 from services.weather import get_weather
 from ai.predict import predict_aqi
 from LLM.advisor import generate_health_advice
-from database.crud import save_dashboard
+from database.crud import save_dashboard, save_log
 from services.cache import get_cached, save_cache
 
 router = APIRouter()
@@ -13,10 +13,31 @@ router = APIRouter()
 @router.get("/dashboard", response_model=DashboardResponse)
 def get_dashboard():
 
-    # Live weather
+    # -------------------------
+    # Get Weather
+    # -------------------------
     weather = get_weather()
 
-    # Sample input for prediction
+    if weather is None:
+        raise HTTPException(
+            status_code=500,
+            detail="Unable to fetch weather data."
+        )
+
+    # -------------------------
+    # Pollutant
+    # -------------------------
+    pollutant =  "PM2.5"
+
+    if not pollutant:
+        raise HTTPException(
+            status_code=400,
+            detail="Pollutant data is missing."
+        )
+
+    # -------------------------
+    # Sample Input
+    # -------------------------
     sample_input = {
         "PM2.5": 120,
         "PM10": 180,
@@ -35,37 +56,69 @@ def get_dashboard():
         "Day": 1
     }
 
-    # AI Prediction
+    # -------------------------
+    # Validate AQI Input
+    # -------------------------
+    if sample_input["PM2.5"] is None:
+        raise HTTPException(
+            status_code=400,
+            detail="AQI data is missing."
+        )
+
+    # -------------------------
+    # Prediction
+    # -------------------------
     prediction = predict_aqi(sample_input)
+
+    if prediction is None:
+        raise HTTPException(
+            status_code=500,
+            detail="Prediction failed."
+        )
 
     aqi = round(prediction["predicted_aqi"])
 
-    # Check cache
+    # -------------------------
+    # Cache
+    # -------------------------
     advice = get_cached(aqi)
 
-    # If not in cache, generate and save
     if advice is None:
+        
         advice = generate_health_advice(aqi)
         save_cache(aqi, advice)
-
-    # Save data into SQLite
+    
+    # -------------------------
+    # Save Dashboard
+    # -------------------------
     save_dashboard(
         current_aqi=220,
         prediction=prediction["predicted_aqi"],
         temperature=weather["temperature"],
         humidity=weather["humidity"],
         weather=weather["weather"],
-        pollutant="PM2.5",
+        pollutant=pollutant,
         health_advisory=advice
     )
 
-    # Return API response
+    # -------------------------
+    # Save Log
+    # -------------------------
+    save_log(
+        aqi=220,
+        forecast=prediction["predicted_aqi"],
+        advice=advice
+    )
+
+    # -------------------------
+    # Response
+    # -------------------------
     return DashboardResponse(
         current_aqi=220,
         prediction=prediction["predicted_aqi"],
         temperature=weather["temperature"],
         humidity=weather["humidity"],
         weather=weather["weather"],
-        pollutant="PM2.5",
+        pollutant=pollutant,
         health_advisory=advice
     )

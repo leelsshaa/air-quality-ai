@@ -3,8 +3,8 @@ import time
 # Dictionary to store cached values
 cache = {}
 
-# Cache duration (5 minutes = 300 seconds)
-CACHE_TIME = 300
+# Cache duration (10 minutes)
+CACHE_TIME = 600
 
 
 def get_cached(aqi):

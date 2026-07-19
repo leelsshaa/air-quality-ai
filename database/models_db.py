@@ -20,3 +20,15 @@ class AQIData(Base):
     pollutant = Column(String)
 
     health_advisory = Column(String)
+
+
+class APILog(Base):
+    __tablename__ = "api_logs"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    aqi = Column(Integer)
+
+    forecast = Column(Float)
+
+    health_advice = Column(String)

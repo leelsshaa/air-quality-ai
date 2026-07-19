@@ -1,5 +1,5 @@
 from database.database import SessionLocal
-from database.models_db import AQIData
+from database.models_db import AQIData, APILog
 
 
 def save_dashboard(
@@ -25,6 +25,27 @@ def save_dashboard(
     )
 
     db.add(data)
+
+    db.commit()
+
+    db.close()
+
+
+def save_log(
+    aqi,
+    forecast,
+    advice
+):
+
+    db = SessionLocal()
+
+    log = APILog(
+        aqi=aqi,
+        forecast=forecast,
+        health_advice=advice
+    )
+
+    db.add(log)
 
     db.commit()
 
