@@ -25,9 +25,10 @@ def get_dashboard():
         )
 
     # -------------------------
-    # Pollutant
+    # City & Pollutant
     # -------------------------
-    pollutant =  "PM2.5"
+    city = "Chennai"
+    pollutant = "PM2.5"
 
     if not pollutant:
         raise HTTPException(
@@ -79,15 +80,30 @@ def get_dashboard():
     aqi = round(prediction["predicted_aqi"])
 
     # -------------------------
+    # AQI Category
+    # -------------------------
+    if aqi <= 50:
+        aqi_category = "Good"
+    elif aqi <= 100:
+        aqi_category = "Satisfactory"
+    elif aqi <= 200:
+        aqi_category = "Moderate"
+    elif aqi <= 300:
+        aqi_category = "Poor"
+    elif aqi <= 400:
+        aqi_category = "Very Poor"
+    else:
+        aqi_category = "Severe"
+
+    # -------------------------
     # Cache
     # -------------------------
     advice = get_cached(aqi)
 
     if advice is None:
-        
         advice = generate_health_advice(aqi)
         save_cache(aqi, advice)
-    
+
     # -------------------------
     # Save Dashboard
     # -------------------------
@@ -114,11 +130,14 @@ def get_dashboard():
     # Response
     # -------------------------
     return DashboardResponse(
+        city=city,
         current_aqi=220,
         prediction=prediction["predicted_aqi"],
+        aqi_category=aqi_category,
         temperature=weather["temperature"],
         humidity=weather["humidity"],
         weather=weather["weather"],
         pollutant=pollutant,
-        health_advisory=advice
+        health_advisory=advice,
+        status="success"
     )
