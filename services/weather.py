@@ -1,12 +1,18 @@
+import os
 import requests
+from dotenv import load_dotenv
 
 from services.weather_cache import (
     get_cached_weather,
     save_weather
 )
 
-API_KEY = "053332e25ea1280ac00c481f35536a87"
-CITY = "Chennai"
+# Load environment variables from .env
+load_dotenv()
+
+# Read API key and city from .env
+API_KEY = os.getenv("API_KEY")
+CITY = os.getenv("CITY")
 
 
 def get_weather():
@@ -18,15 +24,19 @@ def get_weather():
         return cached
 
     # Fetch live weather
-    url = f"https://api.openweathermap.org/data/2.5/weather?q={CITY}&appid={API_KEY}&units=metric"
+    url = (
+        f"https://api.openweathermap.org/data/2.5/weather"
+        f"?q={CITY}&appid={API_KEY}&units=metric"
+    )
 
     response = requests.get(url)
 
-    data = response.json()
-
     # If API fails
     if response.status_code != 200:
+        print("Weather API Error:", response.json())
         return None
+
+    data = response.json()
 
     # Store weather data
     weather = {
