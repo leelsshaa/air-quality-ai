@@ -12,6 +12,7 @@ router = APIRouter()
 
 @router.get("/dashboard", response_model=DashboardResponse)
 def get_dashboard():
+    print("Request Received")
 
     # -------------------------
     # Get Weather
@@ -29,6 +30,11 @@ def get_dashboard():
     # -------------------------
     city = "Chennai"
     pollutant = "PM2.5"
+    if not city.strip():
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid city name."
+    )
 
     if not pollutant:
         raise HTTPException(
@@ -70,6 +76,8 @@ def get_dashboard():
     # Prediction
     # -------------------------
     prediction = predict_aqi(sample_input)
+    print("Prediction Generated")
+    current_aqi = 220
 
     if prediction is None:
         raise HTTPException(
@@ -101,14 +109,21 @@ def get_dashboard():
     advice = get_cached(aqi)
 
     if advice is None:
-        advice = generate_health_advice(aqi)
-        save_cache(aqi, advice)
+        try:
+            advice = generate_health_advice(aqi)
+            print("Health Advisory Generated")
+            save_cache(aqi, advice)
+        except Exception:
+            raise HTTPException(
+            status_code=500,
+            detail="Health advisory generation failed."
+        )
 
     # -------------------------
     # Save Dashboard
     # -------------------------
     save_dashboard(
-        current_aqi=220,
+        current_aqi=current_aqi,
         prediction=prediction["predicted_aqi"],
         temperature=weather["temperature"],
         humidity=weather["humidity"],
@@ -121,7 +136,7 @@ def get_dashboard():
     # Save Log
     # -------------------------
     save_log(
-        aqi=220,
+        aqi=current_aqi,
         forecast=prediction["predicted_aqi"],
         advice=advice
     )
@@ -129,9 +144,11 @@ def get_dashboard():
     # -------------------------
     # Response
     # -------------------------
+    print("Response Sent")
     return DashboardResponse(
+        
         city=city,
-        current_aqi=220,
+        current_aqi=current_aqi,
         prediction=prediction["predicted_aqi"],
         aqi_category=aqi_category,
         temperature=weather["temperature"],
