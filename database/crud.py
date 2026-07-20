@@ -1,0 +1,52 @@
+from database.database import SessionLocal
+from database.models_db import AQIData, APILog
+
+
+def save_dashboard(
+    current_aqi,
+    prediction,
+    temperature,
+    humidity,
+    weather,
+    pollutant,
+    health_advisory
+):
+
+    db = SessionLocal()
+
+    data = AQIData(
+        current_aqi=current_aqi,
+        prediction=prediction,
+        temperature=temperature,
+        humidity=humidity,
+        weather=weather,
+        pollutant=pollutant,
+        health_advisory=health_advisory
+    )
+
+    db.add(data)
+
+    db.commit()
+
+    db.close()
+
+
+def save_log(
+    aqi,
+    forecast,
+    advice
+):
+
+    db = SessionLocal()
+
+    log = APILog(
+        aqi=aqi,
+        forecast=forecast,
+        health_advice=advice
+    )
+
+    db.add(log)
+
+    db.commit()
+
+    db.close()
