@@ -49,6 +49,9 @@ def predict_aqi(input_data):
     # Convert dictionary to DataFrame
     data = pd.DataFrame([input_data])
 
+    # Reorder columns exactly as used during training
+    data = data[required_columns]
+
     # Predict AQI
     prediction = round(float(model.predict(data)[0]), 2)
 

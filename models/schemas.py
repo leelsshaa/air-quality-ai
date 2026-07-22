@@ -1,5 +1,10 @@
 from pydantic import BaseModel
 
+class SourceAnalysis(BaseModel):
+    dominant_pollutant: str
+    likely_sources: list[str]
+    analysis: str
+
 
 class DashboardResponse(BaseModel):
     city: str
@@ -11,6 +16,7 @@ class DashboardResponse(BaseModel):
     weather: str
     pollutant: str
     health_advisory: str
+    source_analysis: SourceAnalysis
     status: str
 
 

@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from models.schemas import ForecastResponse
-from ai.predict import predict_aqi   # <-- Member 3's file
+from AI.predict import predict_aqi   # <-- Member 3's file
 
 router = APIRouter()
 

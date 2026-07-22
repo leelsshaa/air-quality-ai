@@ -12,13 +12,12 @@ load_dotenv()
 
 # Read API key and city from .env
 API_KEY = os.getenv("API_KEY")
-CITY = os.getenv("CITY")
 
 
-def get_weather():
+def get_weather(city):
 
     # Check if weather is already cached
-    cached = get_cached_weather()
+    cached = get_cached_weather(city)
 
     if cached:
         return cached
@@ -26,7 +25,7 @@ def get_weather():
     # Fetch live weather
     url = (
         f"https://api.openweathermap.org/data/2.5/weather"
-        f"?q={CITY}&appid={API_KEY}&units=metric"
+        f"?q={city}&appid={API_KEY}&units=metric"
     )
 
     response = requests.get(url)
@@ -46,7 +45,7 @@ def get_weather():
     }
 
     # Save into cache
-    save_weather(weather)
+    save_weather(city, weather)
 
     return weather
 

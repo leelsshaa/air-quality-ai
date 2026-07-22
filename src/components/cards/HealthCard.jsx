@@ -1,49 +1,6 @@
-import { useState, useEffect } from "react";
-import axios from "axios";
 import { Link } from "react-router-dom";
 
-function HealthCard() {
-
-  const [advice, setAdvice] = useState(
-    "Air quality is unhealthy. Wear an N95 mask."
-  );
-
-  const [loading, setLoading] = useState(true);
-
-
-  useEffect(() => {
-
-    axios
-      .post("http://127.0.0.1:8000/health-advisory", {
-        aqi: 220,
-      })
-      .then((response) => {
-
-        if (response.data?.advisory) {
-          setAdvice(response.data.advisory);
-        }
-
-        setLoading(false);
-
-      })
-      .catch((error) => {
-
-        console.log(
-          "Using demo health advisory data:",
-          error
-        );
-
-        // Demo fallback
-        setAdvice(
-          "Air quality is unhealthy. Wear an N95 mask and avoid prolonged outdoor exposure."
-        );
-
-        setLoading(false);
-
-      });
-
-
-  }, []);
+function HealthCard({ advice, aqi }) {
 
 
 
@@ -94,18 +51,39 @@ function HealthCard() {
         </p>
 
 
-        <span className="
-          inline-block 
-          mt-2 
-          px-4 
-          py-2 
-          rounded-full 
-          bg-red-100 
-          text-red-700 
+        
+
+      <span
+        className={`
+          inline-block
+          mt-2
+          px-4
+          py-2
+          rounded-full
           font-semibold
-        ">
-          ⚠ Unhealthy Air Quality
-        </span>
+          ${
+            aqi <= 50
+            ? "bg-green-100 text-green-700"
+            : aqi <= 100
+            ? "bg-yellow-100 text-yellow-700"
+            : aqi <= 200
+            ? "bg-orange-100 text-orange-700"
+            : aqi <= 300
+            ? "bg-red-100 text-red-700"
+            : "bg-purple-100 text-purple-700"
+          }
+        `}  
+      >
+        {aqi <= 50
+          ? "🟢 Good Air Quality"
+          : aqi <= 100
+          ? "🟡 Moderate Air Quality"
+          : aqi <= 200
+          ? "🟠 Poor Air Quality"
+          : aqi <= 300
+          ? "🔴 Very Poor Air Quality"
+          : "🟣 Severe Air Quality"}
+      </span>
 
 
       </div>
@@ -120,17 +98,9 @@ function HealthCard() {
           AI Recommendation
         </h4>
 
-
-        <p className="mt-2 text-gray-600">
-
-
-          {loading
-            ? "Generating AI recommendation..."
-            : advice
-          }
-
-
-        </p>
+      <p className="mt-2 text-gray-600">
+         {advice || "No health advisory available."}
+      </p>
 
 
       </div>
@@ -149,33 +119,33 @@ function HealthCard() {
 
 
         <ul className="mt-3 space-y-2 text-gray-600">
-
-
-          <li>
-            ✔ Wear an N95 mask
-          </li>
-
-
-          <li>
-            ✔ Avoid outdoor exercise
-          </li>
-
-
-          <li>
-            ✔ Keep windows closed
-          </li>
-
-
-          <li>
-            ✔ Stay hydrated
-          </li>
-
-
-          <li>
-            ✔ Sensitive groups should stay indoors
-          </li>
-
-
+          {aqi <= 50 ? (
+            <>
+              <li>✔ Enjoy outdoor activities</li>
+              <li>✔ Keep monitoring local air quality</li>
+              <li>✔ Stay hydrated</li>
+            </>
+          ) : aqi <= 100 ? (
+            <>
+              <li>✔ Sensitive people should limit prolonged outdoor exposure</li>
+              <li>✔ Drink plenty of water</li>
+              <li>✔ Monitor symptoms if you have asthma</li>
+            </>
+          ) : aqi <= 200 ? (
+            <>
+              <li>✔ Wear a mask if outdoors for long periods</li>
+              <li>✔ Reduce strenuous outdoor exercise</li>
+              <li>✔ Keep indoor air clean</li>
+            </>
+          ) : (
+            <>
+              <li>✔ Wear an N95 mask</li>
+              <li>✔ Avoid outdoor exercise</li>
+              <li>✔ Keep windows closed</li>
+              <li>✔ Stay hydrated</li>
+              <li>✔ Sensitive groups should stay indoors</li>
+            </>
+          )}
         </ul>
 
 

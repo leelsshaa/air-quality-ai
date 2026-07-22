@@ -10,31 +10,29 @@ import ForecastCard from "../../components/cards/ForecastCard";
 import HealthCard from "../../components/cards/HealthCard";
 import PollutionSourceCard from "../../components/cards/PollutionSourceCard";
 import AQITrendChart from "../../components/charts/AQITrendChart";
-import { demoDashboard } from "../../data/demoData";
+
 
 function Dashboard() {
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [city, setCity] = useState("Chennai");
 
-  const fetchDashboardData = () => {
-    setLoading(true);
-    setError("");
+ const fetchDashboardData = () => {
+  setLoading(true);
+  setError("");
 
-    axios
-      .get("http://127.0.0.1:8000/dashboard")
-      .then((response) => {
-        setDashboardData(response.data);
-        setLoading(false);
-      })
-      .catch(() => {
-        console.log("Backend unavailable. Loading demo data...");
-
-        setDashboardData(demoDashboard);
-
-        setLoading(false);
-      });
-  };
+  axios
+    .get(`http://127.0.0.1:8000/dashboard?city=${city}`)
+    .then((response) => {
+      setDashboardData(response.data);
+      setLoading(false);
+    })
+    .catch(() => {
+      setError("Unable to fetch dashboard data.");
+      setLoading(false);
+    });
+};
 
   useEffect(() => {
     fetchDashboardData();
@@ -145,6 +143,7 @@ function Dashboard() {
         {/* Heading */}
 
         <div className="mb-8">
+          
 
           {/* UPDATED HEADING STYLE */}
           <h2 className="text-3xl md:text-4xl font-bold text-gray-800">
@@ -161,10 +160,36 @@ function Dashboard() {
 
         </div>
 
+      <div className="flex flex-col md:flex-row gap-4 mb-8">
+
+          <input
+            type="text"
+            value={city}
+            onChange={(e) => setCity(e.target.value)}
+            placeholder="Enter city..."
+            className="flex-1 p-3 border rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500"
+        />
+
+        <button
+          onClick={fetchDashboardData}
+          className="bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700"
+        >
+         Search
+        </button>
+
+      </div>
 
         {/* Summary Cards */}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-6">
+
+          <StatsCard
+            title="Predicted AQI"
+            value={dashboardData.prediction}
+            icon="🤖"
+            color="text-indigo-600"
+            bgColor="bg-indigo-50"
+          />
 
           <StatsCard
             title="Current AQI"
@@ -235,8 +260,9 @@ function Dashboard() {
 
           <ForecastCard />
 
-          <HealthCard 
-            aqi={dashboardData.current_aqi} 
+          <HealthCard
+            advice={dashboardData.health_advisory}
+            aqi={dashboardData.current_aqi}
           />
 
         </div>
@@ -247,13 +273,7 @@ function Dashboard() {
         <div className="mt-8">
 
           <PollutionSourceCard
-
-            data={{
-              traffic: 70,
-              construction: 20,
-              industry: 10,
-            }}
-
+            data={dashboardData?.source_analysis}
           />
 
         </div>
